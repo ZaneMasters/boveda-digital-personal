@@ -37,19 +37,35 @@ const BOTTOM_ITEMS = [
 ];
 
 export function AppSidebar() {
-  const { isSidebarCollapsed, toggleSidebar } = useUIStore();
+  const { isSidebarCollapsed, toggleSidebar, isMobileSidebarOpen, setMobileSidebarOpen } = useUIStore();
   const { lock } = useVaultStore();
   const { settings } = useAuthStore();
 
   const showDev = settings?.developerModeEnabled ?? false;
 
   return (
-    <motion.aside
-      animate={{ width: isSidebarCollapsed ? 64 : 240 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="fixed left-0 top-0 h-full flex flex-col z-30 border-r"
-      style={{ background: 'var(--bg-sidebar)', borderColor: 'var(--border-subtle)' }}
-    >
+    <>
+      {/* Mobile backdrop */}
+      <AnimatePresence>
+        {isMobileSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMobileSidebarOpen(false)}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.aside
+        animate={{ width: isSidebarCollapsed ? 64 : 240 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className={`fixed left-0 top-0 h-full flex flex-col z-50 border-r transition-transform duration-300 ${
+          isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+        style={{ background: 'var(--bg-sidebar)', borderColor: 'var(--border-subtle)' }}
+      >
       {/* Logo */}
       <div className="flex items-center h-16 px-4 border-b shrink-0"
         style={{ borderColor: 'var(--border-subtle)' }}>
@@ -142,8 +158,8 @@ export function AppSidebar() {
         </button>
       </div>
 
-      {/* Collapse toggle */}
-      <div className="border-t px-2 py-3" style={{ borderColor: 'var(--border-subtle)' }}>
+      {/* Collapse toggle (Desktop only) */}
+      <div className="border-t px-2 py-3 hidden md:block" style={{ borderColor: 'var(--border-subtle)' }}>
         <button
           onClick={toggleSidebar}
           className="sidebar-link w-full"
@@ -167,6 +183,7 @@ export function AppSidebar() {
         </button>
       </div>
     </motion.aside>
+    </>
   );
 }
 
@@ -178,11 +195,14 @@ interface NavItem {
 }
 
 function SidebarLink({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
+  const { setMobileSidebarOpen } = useUIStore();
+  
   return (
     <NavLink
       to={item.to}
       end={item.end}
       title={collapsed ? item.label : undefined}
+      onClick={() => setMobileSidebarOpen(false)}
       className={({ isActive }) =>
         cn('sidebar-link', isActive && 'active')
       }

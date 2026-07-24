@@ -5,8 +5,10 @@ import { persist } from 'zustand/middleware';
 interface UIState {
   // Sidebar
   isSidebarCollapsed: boolean;
+  isMobileSidebarOpen: boolean;
   toggleSidebar: () => void;
   setSidebarCollapsed: (val: boolean) => void;
+  setMobileSidebarOpen: (val: boolean) => void;
 
   // Search
   isSearchOpen: boolean;
@@ -29,9 +31,11 @@ export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
       isSidebarCollapsed: false,
+      isMobileSidebarOpen: false,
       toggleSidebar: () =>
         set((s) => ({ isSidebarCollapsed: !s.isSidebarCollapsed })),
       setSidebarCollapsed: (val) => set({ isSidebarCollapsed: val }),
+      setMobileSidebarOpen: (val) => set({ isMobileSidebarOpen: val }),
 
       isSearchOpen: false,
       searchQuery: '',

@@ -63,14 +63,14 @@ export function DashboardPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="rounded-2xl p-6 flex items-center justify-between"
+        className="rounded-2xl p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0"
         style={{
           background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(124,58,237,0.08))',
           border: '1px solid rgba(139,92,246,0.2)',
         }}
       >
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
             style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}>
             <Shield className="w-6 h-6 text-white" />
           </div>
@@ -82,9 +82,9 @@ export function DashboardPage() {
             </div>
           </div>
         </div>
-        <div className="text-right flex flex-col items-end">
+        <div className="flex flex-col items-start md:items-end w-full md:w-auto mt-2 md:mt-0">
           <p className="text-xs text-surface-500">{score === 0 ? 'Add items to get your score' : 'Looking good!'}</p>
-          <div className="w-48 h-2 rounded-full mt-2 overflow-hidden" style={{ background: 'var(--bg-tertiary)' }}>
+          <div className="w-full md:w-48 h-2 rounded-full mt-2 overflow-hidden" style={{ background: 'var(--bg-tertiary)' }}>
             <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${score}%`, background: 'linear-gradient(90deg, #8b5cf6, #a78bfa)' }} />
           </div>
         </div>

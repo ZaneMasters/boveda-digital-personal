@@ -33,8 +33,9 @@ export function AppLayout() {
 
       {/* Main content */}
       <div
-        className="flex flex-col flex-1 min-w-0 transition-all duration-300"
-        style={{ marginLeft: isSidebarCollapsed ? '64px' : '240px' }}
+        className={`flex flex-col flex-1 min-w-0 transition-all duration-300 ${
+          isSidebarCollapsed ? 'md:ml-[64px]' : 'md:ml-[240px]'
+        }`}
       >
         {/* Header */}
         <AppHeader />
