@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Lock, Eye, EyeOff, Loader2, AlertCircle, LogOut, ShieldCheck } from 'lucide-react';
+import { Lock, Eye, EyeOff, Loader2, AlertCircle, LogOut } from 'lucide-react';
 import { unlockVaultWithMasterPassword } from '@/services/auth.service';
 import { signOutUser } from '@/services/auth.service';
 import { useAuthStore } from '@/store/auth.store';
@@ -50,31 +50,52 @@ export function VaultUnlockPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface-950 p-6">
+    <div 
+      className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #070B14 0%, #0F172A 100%)' }}
+    >
+      {/* Animated Background Orbs */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.97 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-sm"
+        animate={{ 
+          scale: [1, 1.1, 1],
+          opacity: [0.8, 1, 0.8],
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-[-100px] left-[-100px] w-[700px] h-[700px] rounded-full blur-[100px] pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, rgba(139,92,246,0) 70%)' }}
+      />
+      <motion.div
+        animate={{ 
+          scale: [1, 1.15, 1],
+          opacity: [0.7, 1, 0.7],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute bottom-[-200px] right-[-200px] w-[900px] h-[900px] rounded-full blur-[100px] pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.20) 0%, rgba(59,130,246,0) 70%)' }}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.97, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-sm relative z-10 p-8 rounded-3xl"
+        style={{ 
+          background: 'rgba(15, 23, 42, 0.6)', 
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+        }}
       >
-        {/* Lock icon */}
+        {/* Logo */}
         <div className="flex justify-center mb-8">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #1e293b, #0f172a)', border: '1px solid #334155' }}>
-              <Lock className="w-8 h-8 text-brand-400" />
-            </div>
+          <div className="w-20 h-20 flex items-center justify-center relative">
+            <div className="absolute inset-0 bg-brand-500/20 blur-xl rounded-full" />
+            <img src="/favicon.svg" alt="VaultOne Logo" className="w-16 h-16 relative z-10" />
           </div>
         </div>
 
         {/* Greeting */}
         <div className="text-center mb-8">
-          {avatarUrl && (
-            <img
-              src={avatarUrl}
-              alt={displayName}
-              className="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-surface-700"
-            />
-          )}
           <h1 className="text-xl font-bold text-white">
             Hello, {displayName} 👋
           </h1>
@@ -86,7 +107,7 @@ export function VaultUnlockPage() {
         <form onSubmit={handleUnlock} className="space-y-4">
           {/* Master password input */}
           <div className="relative">
-            <ShieldCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500" />
+            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500" />
             <input
               id="unlock-master-password"
               type={showPassword ? 'text' : 'password'}

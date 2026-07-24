@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Eye, EyeOff, AlertTriangle, Loader2, CheckCircle2 } from 'lucide-react';
+import { Lock, Eye, EyeOff, AlertTriangle, Loader2, CheckCircle2 } from 'lucide-react';
 import { setupMasterPassword, signOutUser } from '@/services/auth.service';
 import { useAuthStore } from '@/store/auth.store';
 import { useVaultStore } from '@/store/vault.store';
@@ -72,9 +72,9 @@ export function MasterPasswordSetupPage() {
       >
         {/* Icon */}
         <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', boxShadow: '0 0 40px rgba(139,92,246,0.3)' }}>
-            <ShieldCheck className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center relative">
+            <div className="absolute inset-0 bg-brand-500/20 blur-xl rounded-full" />
+            <img src="/favicon.svg" alt="VaultOne Logo" className="w-16 h-16 relative z-10" />
           </div>
         </div>
 
@@ -197,7 +197,7 @@ export function MasterPasswordSetupPage() {
             disabled={isLoading || !masterPassword || !confirm}
             className="btn-brand w-full mt-2"
           >
-            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
             Protect My Vault
           </button>
         </form>

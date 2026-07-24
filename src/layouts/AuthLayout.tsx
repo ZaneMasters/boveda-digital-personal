@@ -1,7 +1,6 @@
 // src/layouts/AuthLayout.tsx
 import { Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShieldCheck } from 'lucide-react';
 
 export function AuthLayout() {
   return (
@@ -21,10 +20,7 @@ export function AuthLayout() {
         {/* Logo */}
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}>
-              <ShieldCheck className="w-5 h-5 text-white" />
-            </div>
+            <img src="/favicon.svg" alt="VaultOne Logo" className="w-10 h-10 shrink-0" />
             <span className="text-2xl font-bold text-white tracking-tight">VaultOne</span>
           </div>
         </div>
@@ -80,10 +76,7 @@ export function AuthLayout() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex items-center gap-3 mb-10 lg:hidden">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}>
-              <ShieldCheck className="w-4 h-4 text-white" />
-            </div>
+            <img src="/favicon.svg" alt="VaultOne Logo" className="w-9 h-9 shrink-0" />
             <span className="text-xl font-bold text-white">VaultOne</span>
           </div>
 

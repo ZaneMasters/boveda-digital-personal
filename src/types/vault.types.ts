@@ -51,6 +51,7 @@ export interface VaultItem {
   createdAt: Timestamp;
   updatedAt: Timestamp;
   lastAccessedAt?: Timestamp;
+  usageCount?: number;
 }
 
 /** A decrypted vault item with typed data */

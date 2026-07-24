@@ -53,6 +53,7 @@ export async function createVaultItem<T>(
     encryptedData,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
+    usageCount: 0,
   };
 
   if (meta.categoryId !== undefined) item.categoryId = meta.categoryId;
@@ -70,20 +71,24 @@ export async function updateVaultItem<T>(
   itemId: string,
   name: string,
   data: T,
-  meta: Partial<Pick<VaultItem, 'isFavorite' | 'categoryId' | 'tags' | 'color' | 'icon'>> = {}
+  meta: Partial<Pick<VaultItem, 'isFavorite' | 'categoryId' | 'tags' | 'color' | 'icon' | 'usageCount'>> = {}
 ): Promise<void> {
   const encryptedData = await encrypt(data, key);
 
-  await updateDoc(itemDoc(uid, itemId), {
+  const updatePayload: any = {
     name,
     encryptedData,
-    ...(meta.isFavorite !== undefined && { isFavorite: meta.isFavorite }),
-    ...(meta.tags && { tags: meta.tags }),
-    ...(meta.color !== undefined && { color: meta.color }),
-    ...(meta.categoryId !== undefined && { categoryId: meta.categoryId }),
-    ...(meta.icon !== undefined && { icon: meta.icon }),
     updatedAt: serverTimestamp(),
-  });
+  };
+
+  if (meta.isFavorite !== undefined) updatePayload.isFavorite = meta.isFavorite;
+  if (meta.tags) updatePayload.tags = meta.tags;
+  if (meta.color !== undefined) updatePayload.color = meta.color;
+  if (meta.categoryId !== undefined) updatePayload.categoryId = meta.categoryId;
+  if (meta.icon !== undefined) updatePayload.icon = meta.icon;
+  if (meta.usageCount !== undefined) updatePayload.usageCount = meta.usageCount;
+
+  await updateDoc(itemDoc(uid, itemId), updatePayload);
 }
 
 /** Soft delete (move to trash) */

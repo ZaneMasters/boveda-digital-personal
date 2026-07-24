@@ -2,7 +2,7 @@
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ShieldCheck, LayoutDashboard, KeyRound, StickyNote,
+  LayoutDashboard, KeyRound, StickyNote,
   CreditCard, Landmark, User, FileText, Paperclip,
   Wifi, Key, RefreshCw, Terminal, Shield, Zap,
   Settings, ChevronLeft, Lock, LogOut
@@ -64,15 +64,16 @@ export function AppSidebar() {
         className={`fixed left-0 top-0 h-full flex flex-col z-50 border-r transition-transform duration-300 ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
-        style={{ background: 'var(--bg-sidebar)', borderColor: 'var(--border-subtle)' }}
+        style={{ 
+          background: 'rgba(11, 16, 32, 0.4)', 
+          backdropFilter: 'blur(16px)',
+          borderColor: 'rgba(255, 255, 255, 0.05)' 
+        }}
       >
       {/* Logo */}
       <div className="flex items-center h-16 px-4 border-b shrink-0"
         style={{ borderColor: 'var(--border-subtle)' }}>
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-          style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}>
-          <ShieldCheck className="w-4 h-4 text-white" />
-        </div>
+        <img src="/favicon.svg" alt="VaultOne Logo" className="w-8 h-8 shrink-0" />
         <AnimatePresence>
           {!isSidebarCollapsed && (
             <motion.span

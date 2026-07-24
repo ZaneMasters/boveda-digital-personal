@@ -9,9 +9,10 @@ export interface PasswordItemProps {
   item: DecryptedVaultItem<PasswordData>;
   onEdit: (item: DecryptedVaultItem<PasswordData>) => void;
   onDelete: (id: string) => void;
+  onUse?: (item: DecryptedVaultItem<PasswordData>) => void;
 }
 
-export function PasswordItem({ item, onEdit, onDelete }: PasswordItemProps) {
+export function PasswordItem({ item, onEdit, onDelete, onUse }: PasswordItemProps) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const data = item.data;
@@ -69,15 +70,16 @@ export function PasswordItem({ item, onEdit, onDelete }: PasswordItemProps) {
               target="_blank"
               rel="noopener noreferrer"
               title="Open website"
+              onClick={() => onUse?.(item)}
               className="p-1.5 rounded-md transition-colors text-surface-500 hover:text-surface-200 hover:bg-surface-800 focus:outline-none focus:ring-2 focus:ring-brand-500/50 flex items-center justify-center bg-surface-900 border border-surface-700 h-[32px] w-[32px] sm:h-[34px] sm:w-[34px]"
             >
               <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </a>
           )}
           <div className="flex items-center bg-surface-900 border border-surface-700 rounded-lg p-1">
-            <CopyButton value={data.username || data.email || ''} title="Copy username" iconType="user" className="hover:bg-surface-800" />
+            <CopyButton value={data.username || data.email || ''} title="Copy username" iconType="user" className="hover:bg-surface-800" onClick={() => onUse?.(item)} />
             <div className="w-px h-4 bg-surface-700 mx-1" />
-            <CopyButton value={data.password || ''} title="Copy password" iconType="password" className="hover:bg-surface-800" />
+            <CopyButton value={data.password || ''} title="Copy password" iconType="password" className="hover:bg-surface-800" onClick={() => onUse?.(item)} />
           </div>
         </div>
 

@@ -7,7 +7,7 @@ export interface CopyButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
   iconType?: 'default' | 'user' | 'password';
 }
 
-export function CopyButton({ value, iconType = 'default', className, ...props }: CopyButtonProps) {
+export function CopyButton({ value, iconType = 'default', className, onClick, ...props }: CopyButtonProps) {
   const { copiedId, copy } = useClipboard();
   const hasCopied = copiedId === value;
 
@@ -20,6 +20,7 @@ export function CopyButton({ value, iconType = 'default', className, ...props }:
         e.preventDefault();
         e.stopPropagation();
         copy(value, value);
+        if (onClick) onClick(e);
       }}
       className={cn(
         'p-1.5 rounded-md transition-colors text-surface-500 hover:text-surface-200 hover:bg-surface-800 focus:outline-none focus:ring-2 focus:ring-brand-500/50',

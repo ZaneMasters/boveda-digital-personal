@@ -19,7 +19,11 @@ export function AppHeader() {
   return (
     <header
       className="h-16 flex items-center justify-between px-4 md:px-6 border-b shrink-0 gap-2 md:gap-4"
-      style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-subtle)' }}
+      style={{ 
+        background: 'rgba(11, 16, 32, 0.4)', 
+        backdropFilter: 'blur(16px)',
+        borderColor: 'rgba(255, 255, 255, 0.05)' 
+      }}
     >
       <div className="flex items-center gap-2 md:gap-4 flex-1">
         {/* Mobile menu toggle */}
