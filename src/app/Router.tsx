@@ -102,7 +102,7 @@ export function Router() {
         >
           <Route index element={<DashboardPage />} />
           <Route path="passwords" element={<PasswordsPage />} />
-          <Route path="notes" element={<div className="p-8"><h1 className="text-2xl font-bold text-white mb-4">Secure Notes</h1><p className="text-surface-400">Coming soon in Phase 3</p></div>} />
+          <Route path="notes" element={<NotesPage />} />
           <Route path="cards" element={<CardsPage />} />
           <Route path="bank" element={<BankAccountsPage />} />
           <Route path="identities" element={<IdentitiesPage />} />
