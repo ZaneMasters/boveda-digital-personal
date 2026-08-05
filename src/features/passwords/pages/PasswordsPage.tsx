@@ -184,7 +184,10 @@ export function PasswordsPage() {
           </div>
         ) : error ? (
           <div className="p-4 rounded-xl bg-danger-500/10 text-danger-400 text-center border border-danger-500/20">
-            Failed to load passwords. Please check your connection.
+            <p className="font-medium">Failed to load passwords.</p>
+            <p className="text-xs mt-1 text-danger-500 opacity-80">
+              {error instanceof Error ? error.message : 'Please check your connection.'}
+            </p>
           </div>
         ) : filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center px-4">

@@ -9,9 +9,7 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   serverTimestamp,
-  type QueryConstraint,
 } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 import { encrypt, decrypt } from '@/crypto';
@@ -129,24 +127,33 @@ export async function getVaultItemsByType(
   key: CryptoKey,
   type: VaultItemType
 ): Promise<DecryptedVaultItem[]> {
-  const constraints: QueryConstraint[] = [
-    where('type', '==', type),
-    where('isDeleted', '==', false),
-  ];
-
-  const q = query(itemsCollection(uid), ...constraints);
-  const snapshot = await getDocs(q);
-
-  const items = await Promise.all(
-    snapshot.docs.map(async (docSnap) => {
-      const item = docSnap.data() as VaultItem;
-      const data = await decrypt(item.encryptedData, key);
-      const { encryptedData: _, ...rest } = item;
-      return { ...rest, data } as DecryptedVaultItem;
-    })
+  // Query by type only (single-field index — no composite index needed).
+  // isDeleted is filtered client-side to avoid a composite index requirement.
+  const q = query(
+    itemsCollection(uid),
+    where('type', '==', type)
   );
 
-  return items.sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+  const snapshot = await getDocs(q);
+
+  const results = await Promise.all(
+    snapshot.docs
+      .map((docSnap) => docSnap.data() as VaultItem)
+      .filter((item) => item.isDeleted === false)  // client-side filter
+      .map(async (item): Promise<DecryptedVaultItem | null> => {
+        try {
+          const data = await decrypt(item.encryptedData, key);
+          const { encryptedData: _, ...rest } = item;
+          return { ...rest, data } as DecryptedVaultItem;
+        } catch (e) {
+          console.error(`[vault] Failed to decrypt item ${item.id}:`, e);
+          return null;
+        }
+      })
+  );
+
+  return (results.filter(Boolean) as DecryptedVaultItem[])
+    .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
 }
 
 /** Fetch all non-deleted items (for global search / dashboard) */
@@ -154,23 +161,28 @@ export async function getAllVaultItems(
   uid: string,
   key: CryptoKey
 ): Promise<DecryptedVaultItem[]> {
-  const q = query(
-    itemsCollection(uid),
-    where('isDeleted', '==', false)
-  );
-
+  // Fetch all items and filter isDeleted client-side.
+  const q = query(itemsCollection(uid));
   const snapshot = await getDocs(q);
 
-  const items = await Promise.all(
-    snapshot.docs.map(async (docSnap) => {
-      const item = docSnap.data() as VaultItem;
-      const data = await decrypt(item.encryptedData, key);
-      const { encryptedData: _, ...rest } = item;
-      return { ...rest, data } as DecryptedVaultItem;
-    })
+  const results = await Promise.all(
+    snapshot.docs
+      .map((docSnap) => docSnap.data() as VaultItem)
+      .filter((item) => item.isDeleted === false)  // client-side filter
+      .map(async (item): Promise<DecryptedVaultItem | null> => {
+        try {
+          const data = await decrypt(item.encryptedData, key);
+          const { encryptedData: _, ...rest } = item;
+          return { ...rest, data } as DecryptedVaultItem;
+        } catch (e) {
+          console.error(`[vault] Failed to decrypt item ${item.id}:`, e);
+          return null;
+        }
+      })
   );
 
-  return items.sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+  return (results.filter(Boolean) as DecryptedVaultItem[])
+    .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
 }
 
 /** Fetch trashed items */
@@ -185,16 +197,22 @@ export async function getTrashedItems(
 
   const snapshot = await getDocs(q);
 
-  const items = await Promise.all(
-    snapshot.docs.map(async (docSnap) => {
+  const results = await Promise.all(
+    snapshot.docs.map(async (docSnap): Promise<DecryptedVaultItem | null> => {
       const item = docSnap.data() as VaultItem;
-      const data = await decrypt(item.encryptedData, key);
-      const { encryptedData: _, ...rest } = item;
-      return { ...rest, data } as DecryptedVaultItem;
+      try {
+        const data = await decrypt(item.encryptedData, key);
+        const { encryptedData: _, ...rest } = item;
+        return { ...rest, data } as DecryptedVaultItem;
+      } catch (e) {
+        console.error(`[vault] Failed to decrypt trashed item ${item.id}:`, e);
+        return null;
+      }
     })
   );
 
-  return items.sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+  return (results.filter(Boolean) as DecryptedVaultItem[])
+    .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
 }
 
 /** Fetch a single item by id */

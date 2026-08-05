@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Loader2, AlertCircle } from 'lucide-react';
 import {
   signInWithGoogle,
+  signInWithGitHub,
   registerWithEmail,
   hasCompletedOnboarding,
 } from '@/services/auth.service';
@@ -22,11 +23,16 @@ export function RegisterPage() {
     setError(null);
     setOauthLoading(provider);
     try {
-      const result = await signInWithGoogle();
+      const result = provider === 'github'
+        ? await signInWithGitHub()
+        : await signInWithGoogle();
 
       const completed = await hasCompletedOnboarding(result.user.uid);
       navigate(completed ? '/unlock' : '/setup', { replace: true });
-    } catch (err) {
+    } catch (err: unknown) {
+      // Ignore cancelled popup (user closed it)
+      if ((err as { code?: string })?.code === 'auth/popup-closed-by-user' ||
+          (err as { code?: string })?.code === 'auth/cancelled-popup-request') return;
       setError(err instanceof Error ? err.message : 'Authentication failed');
     } finally {
       setOauthLoading(null);

@@ -31,7 +31,8 @@ export function useVaultItems(type?: VaultItemType) {
   return useQuery({
     queryKey: type ? queryKeys.list(type) : queryKeys.lists(),
     queryFn: async () => {
-      if (!user?.uid || !cryptoKey) throw new Error('Unauthorized or Vault locked');
+      // Guard: vault locked or unauthenticated — return empty rather than erroring
+      if (!user?.uid || !cryptoKey) return [];
       if (type) {
         return getVaultItemsByType(user.uid, cryptoKey, type);
       }
@@ -48,7 +49,7 @@ export function useTrashedItems() {
   return useQuery({
     queryKey: queryKeys.trashed(),
     queryFn: async () => {
-      if (!user?.uid || !cryptoKey) throw new Error('Unauthorized or Vault locked');
+      if (!user?.uid || !cryptoKey) return [];
       return getTrashedItems(user.uid, cryptoKey);
     },
     enabled: !!user?.uid && !!cryptoKey,
@@ -62,7 +63,7 @@ export function useVaultItem(id: string) {
   return useQuery({
     queryKey: queryKeys.detail(id),
     queryFn: async () => {
-      if (!user?.uid || !cryptoKey) throw new Error('Unauthorized or Vault locked');
+      if (!user?.uid || !cryptoKey) return null;
       return getVaultItemById(user.uid, cryptoKey, id);
     },
     enabled: !!user?.uid && !!cryptoKey && !!id,

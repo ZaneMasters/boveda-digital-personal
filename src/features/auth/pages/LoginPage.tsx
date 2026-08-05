@@ -9,6 +9,7 @@ import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import {
   signInWithEmail,
   signInWithGoogle,
+  signInWithGitHub,
   hasCompletedOnboarding,
 } from '@/services/auth.service';
 
@@ -35,15 +36,16 @@ export function LoginPage() {
     setError(null);
     setOauthLoading(provider);
     try {
-      const result = await signInWithGoogle();
+      const result = provider === 'github'
+        ? await signInWithGitHub()
+        : await signInWithGoogle();
 
       const completed = await hasCompletedOnboarding(result.user.uid);
-      if (!completed) {
-        navigate('/setup', { replace: true });
-      } else {
-        navigate('/unlock', { replace: true });
-      }
-    } catch (err) {
+      navigate(completed ? '/unlock' : '/setup', { replace: true });
+    } catch (err: unknown) {
+      // Ignore cancelled popup (user closed it)
+      if ((err as { code?: string })?.code === 'auth/popup-closed-by-user' ||
+          (err as { code?: string })?.code === 'auth/cancelled-popup-request') return;
       setError(err instanceof Error ? err.message : 'Authentication failed');
     } finally {
       setOauthLoading(null);

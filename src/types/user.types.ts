@@ -25,8 +25,9 @@ export interface UserSettings {
 }
 
 export interface UserSalt {
-  salt: string;   // base64 encoded, 32 bytes
+  salt: string;    // base64 encoded, 32 bytes
   version: number;
+  canary?: import('@/types/crypto.types').EncryptedPayload; // encrypted validation token
 }
 
 export const DEFAULT_USER_SETTINGS: UserSettings = {

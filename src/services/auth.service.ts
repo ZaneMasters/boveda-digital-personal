@@ -21,7 +21,7 @@ import {
 } from 'firebase/firestore';
 import { auth } from '@/firebase/auth';
 import { db } from '@/firebase/firestore';
-import { generateSalt, saltToBase64, base64ToSalt, deriveKey } from '@/crypto';
+import { generateSalt, saltToBase64, base64ToSalt, deriveKey, encrypt, decrypt } from '@/crypto';
 import type { UserProfile, UserSettings, UserSalt } from '@/types/user.types';
 import { DEFAULT_USER_SETTINGS } from '@/types/user.types';
 
@@ -66,7 +66,8 @@ export async function registerWithEmail(
 
 /**
  * Called ONCE after first registration (email or OAuth).
- * Generates a salt, derives the vault key, and stores the salt in Firestore.
+ * Generates a salt, derives the vault key, encrypts a canary token to
+ * allow key validation on future logins, and stores both in Firestore.
  * The Master Password is NEVER stored.
  */
 export async function setupMasterPassword(
@@ -76,9 +77,16 @@ export async function setupMasterPassword(
   const salt = generateSalt();
   const saltBase64 = saltToBase64(salt);
 
-  // Store salt in Firestore (it's not secret — just unique per user)
+  // Derive the vault key
+  const key = await deriveKey(masterPassword, salt);
+
+  // Encrypt a known canary value with the derived key.
+  // We can decrypt this on future logins to verify the password is correct.
+  const canary = await encrypt({ __canary: true }, key);
+
+  // Store salt + canary in Firestore (neither is secret)
   const saltRef = doc(db, 'users', user.uid, 'private', 'salt');
-  const saltDoc: UserSalt = { salt: saltBase64, version: 1 };
+  const saltDoc: UserSalt = { salt: saltBase64, version: 1, canary };
   await setDoc(saltRef, saltDoc);
 
   // Create user profile and settings
@@ -88,13 +96,19 @@ export async function setupMasterPassword(
   const settingsRef = doc(db, 'users', user.uid, 'private', 'settings');
   await setDoc(settingsRef, { hasCompletedOnboarding: true }, { merge: true });
 
-  // Derive and return the vault key (stays in memory only)
-  return deriveKey(masterPassword, salt);
+  // Return the vault key (stays in memory only)
+  return key;
 }
 
 /**
  * Called on every login after the user enters their Master Password.
- * Reads the stored salt, derives the key, and validates it.
+ * Reads the stored salt, derives the key, validates it against the canary,
+ * and returns the verified CryptoKey.
+ *
+ * For accounts created before the canary was introduced, the canary is
+ * created lazily on first unlock and validated on all subsequent ones.
+ *
+ * @throws if the master password is incorrect or salt is missing
  */
 export async function unlockVaultWithMasterPassword(
   user: User,
@@ -107,11 +121,29 @@ export async function unlockVaultWithMasterPassword(
     throw new Error('Salt not found. Please set up your Master Password first.');
   }
 
-  const { salt: saltBase64 } = saltSnap.data() as UserSalt;
-  const salt = base64ToSalt(saltBase64);
+  const saltData = saltSnap.data() as UserSalt;
+  const salt = base64ToSalt(saltData.salt);
+  const key = await deriveKey(masterPassword, salt);
 
-  return deriveKey(masterPassword, salt);
+  if (saltData.canary) {
+    // Canary exists — validate the derived key against it.
+    // AES-GCM will throw if the key is wrong.
+    try {
+      await decrypt(saltData.canary, key);
+    } catch {
+      throw new Error('Incorrect master password. Please try again.');
+    }
+  } else {
+    // No canary yet (account pre-dates this feature).
+    // Migrate: create a canary now with the current key so future
+    // logins are properly validated. This unlock is trusted.
+    const canary = await encrypt({ __canary: true }, key);
+    await setDoc(saltRef, { ...saltData, canary }, { merge: true });
+  }
+
+  return key;
 }
+
 
 /**
  * Checks if user has completed Master Password onboarding.
