@@ -54,24 +54,24 @@ export function VaultUnlockPage() {
       className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #070B14 0%, #0F172A 100%)' }}
     >
-      {/* Animated Background Orbs */}
+      {/* Animated Background Orbs (Optimized for mobile GPU) */}
       <motion.div
         animate={{ 
-          scale: [1, 1.1, 1],
-          opacity: [0.8, 1, 0.8],
+          scale: [1, 1.05, 1],
+          opacity: [0.6, 0.8, 0.6],
         }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[-100px] left-[-100px] w-[700px] h-[700px] rounded-full blur-[100px] pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, rgba(139,92,246,0) 70%)' }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(139,92,246,0) 60%)' }}
       />
       <motion.div
         animate={{ 
-          scale: [1, 1.15, 1],
-          opacity: [0.7, 1, 0.7],
+          scale: [1, 1.1, 1],
+          opacity: [0.5, 0.7, 0.5],
         }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute bottom-[-200px] right-[-200px] w-[900px] h-[900px] rounded-full blur-[100px] pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.20) 0%, rgba(59,130,246,0) 70%)' }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute bottom-[-15%] right-[-15%] w-[700px] h-[700px] sm:w-[1000px] sm:h-[1000px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, rgba(59,130,246,0) 60%)' }}
       />
 
       <motion.div
