@@ -30,6 +30,7 @@ export function PasswordGenerator({ onApply, initialLength = 16 }: PasswordGener
         lowercase: useLowercase,
         numbers: useNumbers,
         symbols: useSymbols,
+        excludeAmbiguous: false,
       });
       setPassword(pwd);
     } catch (e) {
@@ -46,7 +47,7 @@ export function PasswordGenerator({ onApply, initialLength = 16 }: PasswordGener
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [length, useUppercase, useLowercase, useNumbers, useSymbols]);
 
-  const entropy = password ? calculateEntropy(password) : { bits: 0, strength: 'Weak', crackTimeDisplay: 'Instant' };
+  const entropy = password ? calculateEntropy(password) : { bits: 0, strength: 'Very Weak', strengthLabel: 'Very Weak', strengthScore: 0, color: '#ef4444', crackTime: 'Instant' };
   
   const getStrengthColor = (strength: string) => {
     switch (strength) {
@@ -96,7 +97,7 @@ export function PasswordGenerator({ onApply, initialLength = 16 }: PasswordGener
       <div className="space-y-1.5">
         <div className="flex justify-between items-center text-xs">
           <span className="text-surface-400">Strength: <span className="font-medium text-white">{entropy.strength}</span></span>
-          <span className="text-surface-500">~{entropy.crackTimeDisplay} to crack</span>
+          <span className="text-surface-500">~{entropy.crackTime} to crack</span>
         </div>
         <div className="h-1.5 w-full bg-surface-800 rounded-full overflow-hidden">
           <div 

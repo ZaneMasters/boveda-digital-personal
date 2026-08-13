@@ -14,7 +14,7 @@ import {
 } from '@/services/vault.service';
 import { useVaultStore } from '@/store/vault.store';
 import { useAuthStore } from '@/store/auth.store';
-import type { VaultItemType, CreateVaultItemInput, DecryptedVaultItem } from '@/types/vault.types';
+import type { VaultItemType, VaultItem } from '@/types/vault.types';
 
 export const queryKeys = {
   all: ['vault'] as const,
@@ -76,11 +76,11 @@ export function useCreateVaultItem() {
   const { cryptoKey } = useVaultStore();
 
   return useMutation({
-    mutationFn: async ({ type, name, data, ...meta }: CreateVaultItemInput & { type: VaultItemType, name: string }) => {
+    mutationFn: async ({ type, name, data, ...meta }: { type: VaultItemType, name: string, data: any } & Partial<Omit<VaultItem, 'id' | 'createdAt' | 'updatedAt' | 'encryptedData' | 'userId' | 'type' | 'name'>>) => {
       if (!user?.uid || !cryptoKey) throw new Error('Unauthorized or Vault locked');
       return createVaultItem(user.uid, cryptoKey, type, name, data, meta);
     },
-    onSuccess: (newItem, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.list(variables.type) });
     },
@@ -99,7 +99,7 @@ export function useUpdateVaultItem() {
       data,
       type,
       ...meta
-    }: Omit<CreateVaultItemInput, 'type'> & { id: string, name: string, type: VaultItemType }) => {
+    }: { id: string, name: string, type: VaultItemType, data: any } & Partial<Omit<VaultItem, 'id' | 'createdAt' | 'updatedAt' | 'encryptedData' | 'userId' | 'type' | 'name'>>) => {
       if (!user?.uid || !cryptoKey) throw new Error('Unauthorized or Vault locked');
       await updateVaultItem(user.uid, cryptoKey, id, name, data, meta);
       return id;

@@ -32,12 +32,7 @@ import { GeneratorPage } from '@/features/generator/pages/GeneratorPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 
 // Guards
-function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isAuthLoading } = useAuthStore();
-  if (isAuthLoading) return null; // Wait for Firebase to resolve auth state
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return <>{children}</>;
-}
+
 
 function RequireUnlocked({ children }: { children: React.ReactNode }) {
   const { isLocked } = useVaultStore();

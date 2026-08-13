@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Search, StickyNote } from 'lucide-react';
-import { useVaultItems, useDeleteVaultItem, useUpdateVaultItem } from '@/features/vault/hooks/useVaultQueries';
+import { useVaultItems, useDeleteVaultItem } from '@/features/vault/hooks/useVaultQueries';
 import { NoteItem } from '../components/NoteItem';
 import { NoteFormModal } from '../components/NoteFormModal';
 import { NoteViewModal } from '../components/NoteViewModal';
@@ -24,7 +24,7 @@ export function NotesPage() {
 
   const { data: items, isLoading, error } = useVaultItems('note');
   const deleteMutation = useDeleteVaultItem();
-  const updateMutation = useUpdateVaultItem();
+
 
   const handleView = (item: DecryptedVaultItem<NoteData>) => {
     setSelectedItem(item);
@@ -57,16 +57,7 @@ export function NotesPage() {
     }
   };
 
-  const handleUse = async (item: DecryptedVaultItem<NoteData>) => {
-    try {
-      await updateMutation.mutateAsync({
-        ...item,
-        usageCount: (item.usageCount || 0) + 1,
-      });
-    } catch (e) {
-      console.error('Failed to update usage count', e);
-    }
-  };
+
 
   const filteredItems = useMemo(() => {
     if (!items) return [];
@@ -217,7 +208,6 @@ export function NotesPage() {
                   onClick={handleView}
                   onEdit={handleEdit}
                   onDelete={handleDeleteClick}
-                  onUse={handleUse}
                 />
               </motion.div>
             ))}

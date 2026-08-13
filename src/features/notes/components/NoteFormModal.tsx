@@ -14,7 +14,7 @@ import { AlignLeft, AlertCircle } from 'lucide-react';
 const noteSchema = z.object({
   name: z.string().min(1, 'Title is required'),
   content: z.string().min(1, 'Note content cannot be empty'),
-  isMarkdown: z.boolean().default(false),
+  isMarkdown: z.boolean(),
 });
 
 type NoteFormValues = z.infer<typeof noteSchema>;

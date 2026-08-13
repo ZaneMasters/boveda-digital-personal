@@ -19,7 +19,7 @@ export function VaultUnlockPage() {
   const [attempts, setAttempts] = useState(0);
 
   const displayName = profile?.displayName ?? firebaseUser?.displayName ?? firebaseUser?.email?.split('@')[0] ?? 'there';
-  const avatarUrl = profile?.photoURL ?? firebaseUser?.photoURL;
+
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -42,7 +42,7 @@ export function PasswordFormModal({ isOpen, onClose, item }: PasswordFormModalPr
     handleSubmit,
     setValue,
     reset,
-    watch,
+
     formState: { errors },
   } = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),

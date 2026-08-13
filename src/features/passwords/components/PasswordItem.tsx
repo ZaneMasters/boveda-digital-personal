@@ -1,6 +1,6 @@
 // src/features/passwords/components/PasswordItem.tsx
 import { useState, useRef, useEffect } from 'react';
-import { Globe, MoreVertical, KeyRound, User, Edit2, Trash2, ExternalLink } from 'lucide-react';
+import { Globe, MoreVertical, Edit2, Trash2, ExternalLink } from 'lucide-react';
 import type { DecryptedVaultItem, PasswordData } from '@/types/vault.types';
 import { CopyButton } from '@/components/ui/CopyButton';
 import { motion, AnimatePresence } from 'framer-motion';

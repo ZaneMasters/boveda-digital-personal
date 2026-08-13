@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { MoreVertical, StickyNote, Edit2, Trash2 } from 'lucide-react';
 import type { DecryptedVaultItem, NoteData } from '@/types/vault.types';
-import { CopyButton } from '@/components/ui/CopyButton';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import MDEditor from '@uiw/react-md-editor';
 
@@ -11,10 +11,10 @@ export interface NoteItemProps {
   onEdit: (item: DecryptedVaultItem<NoteData>) => void;
   onDelete: (id: string) => void;
   onClick?: (item: DecryptedVaultItem<NoteData>) => void;
-  onUse?: (item: DecryptedVaultItem<NoteData>) => void;
+
 }
 
-export function NoteItem({ item, onEdit, onDelete, onClick, onUse }: NoteItemProps) {
+export function NoteItem({ item, onEdit, onDelete, onClick }: NoteItemProps) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const data = item.data;
