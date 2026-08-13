@@ -85,7 +85,7 @@ sequenceDiagram
 ```
 
 ---
-
+ 
 *Desarrollado con ❤️ combinando el poder de React y la seguridad criptográfica moderna.*
 
 Anely0108
