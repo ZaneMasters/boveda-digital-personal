@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
 import { useVaultItems } from '@/features/vault/hooks/useVaultQueries';
+import { useSecurityScore } from '@/features/security/hooks/useSecurityScore';
 
 const STAT_CARDS_TEMPLATE = [
   { label: 'Passwords', type: 'password', icon: KeyRound, color: '#8b5cf6', to: '/app/passwords' },
@@ -29,6 +30,7 @@ const itemVariants = {
 export function DashboardPage() {
   const { firebaseUser, profile } = useAuthStore();
   const { data: items = [] } = useVaultItems();
+  const sec = useSecurityScore();
   
   const displayName = profile?.displayName ?? firebaseUser?.displayName ?? 'there';
 
@@ -40,7 +42,9 @@ export function DashboardPage() {
     value: items.filter(item => item.type === card.type).length
   }));
 
-  const score = items.length === 0 ? 0 : Math.min(100, items.length * 10 + 40);
+  const score = sec.score;
+  const scoreColor = sec.color;
+  const scoreLabel = sec.totalPasswords === 0 ? 'Add passwords to get your score' : sec.label;
 
   return (
     <div className="p-6 space-y-8 max-w-6xl mx-auto">
@@ -77,15 +81,17 @@ export function DashboardPage() {
           <div>
             <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Security Score</p>
             <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="text-3xl font-bold text-white">{score === 0 ? '—' : score}</span>
+              <span className="text-3xl font-bold" style={{ color: sec.totalPasswords === 0 ? 'white' : scoreColor }}>
+                {score === 0 ? '—' : score}
+              </span>
               <span className="text-sm text-surface-500">/ 100</span>
             </div>
           </div>
         </div>
         <div className="flex flex-col items-start md:items-end w-full md:w-auto mt-2 md:mt-0">
-          <p className="text-xs text-surface-500">{score === 0 ? 'Add items to get your score' : 'Looking good!'}</p>
+          <p className="text-xs text-surface-500">{scoreLabel}</p>
           <div className="w-full md:w-48 h-2 rounded-full mt-2 overflow-hidden" style={{ background: 'var(--bg-tertiary)' }}>
-            <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${score}%`, background: 'linear-gradient(90deg, #8b5cf6, #a78bfa)' }} />
+            <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${score}%`, background: scoreColor }} />
           </div>
         </div>
       </motion.div>
@@ -130,13 +136,13 @@ export function DashboardPage() {
               <AlertTriangle className="w-4 h-4 text-warning-400" />
               <h2 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Password Health</h2>
             </div>
-            <a href="/app/security" className="text-xs text-brand-400 hover:text-brand-300">View Report →</a>
+            <Link to="/app/security" className="text-xs text-brand-400 hover:text-brand-300">View Report →</Link>
           </div>
           <div className="space-y-3">
             {[
-              { label: 'Weak passwords', count: 0, color: '#ef4444' },
-              { label: 'Duplicate passwords', count: 0, color: '#f97316' },
-              { label: 'Old passwords (+90d)', count: 0, color: '#eab308' },
+              { label: 'Weak / Critical',      count: sec.weakCount + sec.criticalCount, color: '#ef4444' },
+              { label: 'Duplicate passwords',   count: sec.duplicateCount,                color: '#f97316' },
+              { label: 'Old passwords (+90d)',  count: sec.oldCount,                      color: '#eab308' },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between">
                 <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{item.label}</span>
